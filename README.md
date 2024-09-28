@@ -11,7 +11,6 @@ To set up the FormAPI in your PocketMine-MP project, follow these steps:
    YourPlugin/
    src/
      yourName/
-       Main.php
        ...
      formspm/
        ...
