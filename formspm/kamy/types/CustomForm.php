@@ -42,6 +42,14 @@ class CustomForm implements PocketMineForm {
         ];
     }
 
+    public function addToggle(string $text, bool $default = false): void {
+        $this->elements[] = [
+            "type" => "toggle",
+            "text" => $text,
+            "default" => $default,
+        ];
+    }
+
     public function setSubmitAction(Closure $action): void {
         $this->submitAction = $action;
     }
