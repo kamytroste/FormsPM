@@ -26,7 +26,7 @@ Un **SimpleForm** es un formulario básico que contiene un título y varios boto
 $form = Form::create(FormType::SIMPLE_FORM);
 
 // Establecer el título del formulario
-$form->setTitle("Formulario Simple");
+$form->setTitle("Simple Form");
 
 // Agregar botones al formulario. Cada botón se le asigna un índice que empieza desde 0.
 // En este caso, "Botón 1" tiene el índice 0, y "Botón 2" tiene el índice 1.
@@ -158,41 +158,55 @@ $form->send($player);
 Un **CustomForm** permite entradas más complejas, como campos de texto (inputs), deslizadores (sliders) y menús desplegables (dropdown).
 Aquí tienes un ejemplo de cómo crear un Custom Form:
 ```php
-// Crea una nueva instancia de Formulario Personalizado
+// Crear una nueva instancia de Formulario Personalizado
 $form = Form::create(FormType::CUSTOM_FORM);
 
-// Establece el título del formulario personalizado
-$form->setTitle("Formulario Personalizado");
+// Establecer el título del formulario personalizado
+$form->setTitle("Custom Form");
 
-// Agrega un campo de entrada donde el jugador puede ingresar su nombre
-// El primer parámetro es la etiqueta mostrada al jugador, y el segundo es un texto de marcador de posición
+// Añadir un campo de entrada donde el jugador puede ingresar su nombre
+// El primer parámetro es la etiqueta que se muestra al jugador, y el segundo es un texto de marcador de posición
 $form->addInput("¿Cuál es tu nombre?", "Ej. Juan");
 
-// Agrega un deslizador donde el jugador puede seleccionar su edad
-// El deslizador permite seleccionar un valor entre 0 y 100, siendo 18 el valor predeterminado
+// Añadir un deslizador donde el jugador puede seleccionar su edad
+// El deslizador permite seleccionar un valor entre 0 y 100, con 18 como valor predeterminado
 $form->addSlider("Selecciona tu edad", 0, 100, 18);
 
-// Agrega una lista desplegable para que el jugador elija un color
+// Añadir una lista desplegable para que el jugador elija un color
 // La lista desplegable contiene tres opciones: "Rojo", "Verde" y "Azul"
 $form->addDropdown("Elige un color", ["Rojo", "Verde", "Azul"]);
 
-// Establece la acción a realizar cuando se envía el formulario
-// El array $data contiene las respuestas del jugador: $data[0] es el nombre, $data[1] es la edad seleccionada, y $data[2] es el color elegido
+// Añadir un interruptor de activación/desactivación (toggle) para habilitar o deshabilitar PvP
+// La etiqueta indica la acción a alternar, por ejemplo, habilitar PvP
+$form->addToggle("¿Habilitar PvP?", false);
+
+// Establecer la acción a realizar cuando se envíe el formulario
 $form->setSubmitAction(function (Player $player, $data) {
-    // Obtiene el nombre ingresado por el jugador; si no se ingresa ninguno, se establece por defecto en "Ninguno"
+    // Obtener el nombre ingresado por el jugador; si no se ingresa ninguno, predeterminar a "Ninguno"
     $name = $data[0] ?? "Ninguno";
     
-    // Obtiene la edad seleccionada por el jugador del deslizador; si no se proporciona un valor, se establece por defecto en 0
+    // Obtener la edad seleccionada por el jugador del deslizador; si no se proporciona valor, predeterminar a 0
     $age = $data[1] ?? 0;
     
-    // Obtiene el color seleccionado por el jugador de la lista desplegable; si no se selecciona ninguno, se establece por defecto en "Ninguno"
+    // Obtener el color seleccionado por el jugador de la lista desplegable; si no se selecciona ninguno, predeterminar a "Ninguno"
     $color = $data[2] ?? "Ninguno";
     
-    // Envía un mensaje al jugador resumiendo sus entradas: nombre, edad y color elegido
-    $player->sendMessage("Nombre: $name, Edad: $age, Color: $color");
+    // Obtener el estado del interruptor (activado/desactivado) seleccionado por el jugador; si no se selecciona, predeterminar a false
+    $pvpEnabled = $data[3] ?? false;
+
+    // Enviar un mensaje al jugador resumiendo sus entradas: nombre, edad, color y el estado de PvP
+    $player->sendMessage("Nombre: $name, Edad: $age, Color: $color, PvP Habilitado: " . ($pvpEnabled ? "Sí" : "No"));
+    
+    // Si PvP está habilitado (el interruptor está 'activado'), realizar una acción, como enviar un mensaje
+    if ($pvpEnabled) {
+        // Ejemplo: enviar un mensaje confirmando que el PvP está habilitado
+        $player->sendMessage("¡El PvP está habilitado! Ahora puedes luchar con otros jugadores.");
+        
+        // También puedes añadir más acciones aquí, como dar un ítem al jugador, etc.
+    }
 });
 
-// Envía el formulario personalizado al jugador para interacción
+// Enviar el formulario personalizado al jugador para interacción
 $form->send($player);
 ```
 
@@ -221,7 +235,13 @@ $form->send($player);
      ```php
      $form->addDropdown("Choose a color", ["Red", "Green", "Blue"]);
      ```
-5. **setSubmitAction(Closure $action): void**
+5. **addToggle(string $label, bool $default = false): void**
+   - Añade un interruptor de alternancia (encendido/apagado) con el que el jugador puede interactuar
+   - **Ejemplo:**
+     ```php
+     $form->addToggle("¿Habilitar PvP?", true);
+     ```
+6. **setSubmitAction(Closure $action): void**
    - Define la acción a ejecutar cuando se envía el formulario.
    - **Ejemplo:**
      ```php
