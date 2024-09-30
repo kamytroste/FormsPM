@@ -165,7 +165,7 @@ Here is an example of how to create a Custom Form:
 // Create a new Custom Form instance
 $form = Form::create(FormType::CUSTOM_FORM);
 
-// Set the title of the custom formspm
+// Set the title of the custom form
 $form->setTitle("Custom Form");
 
 // Add an input field where the player can enter their name
@@ -180,8 +180,11 @@ $form->addSlider("Select your age", 0, 100, 18);
 // The dropdown contains three options: "Red", "Green", and "Blue"
 $form->addDropdown("Choose a color", ["Red", "Green", "Blue"]);
 
-// Set the action to be performed when the formspm is submitted
-// The $data array contains the player's responses: $data[0] is the name, $data[1] is the selected age, and $data[2] is the chosen color
+// Add a toggle switch (on/off) to enable or disable PvP
+// The label indicates the action to toggle, e.g., enabling PvP
+$form->addToggle("Enable PvP?", false);
+
+// Set the action to be performed when the form is submitted
 $form->setSubmitAction(function (Player $player, $data) {
     // Get the name entered by the player; if none is entered, default to "None"
     $name = $data[0] ?? "None";
@@ -192,11 +195,22 @@ $form->setSubmitAction(function (Player $player, $data) {
     // Get the color selected by the player from the dropdown; if none is selected, default to "None"
     $color = $data[2] ?? "None";
     
-    // Send a message to the player summarizing their inputs: name, age, and chosen color
-    $player->sendMessage("Name: $name, Age: $age, Color: $color");
+    // Get the toggle state (on/off) selected by the player; if none is selected, default to false
+    $pvpEnabled = $data[3] ?? false;
+
+    // Send a message to the player summarizing their inputs: name, age, color, and PvP toggle
+    $player->sendMessage("Name: $name, Age: $age, Color: $color, PvP Enabled: " . ($pvpEnabled ? "Yes" : "No"));
+    
+    // If PvP is enabled (toggle is 'on'), perform an action, such as sending a message
+    if ($pvpEnabled) {
+        // Example: send a message confirming PvP is enabled
+        $player->sendMessage("PvP is enabled! You can now fight with other players.");
+        
+        // You can also add more actions here, like giving the player an item, etc.
+    }
 });
 
-// Send the custom formspm to the player for interaction
+// Send the custom form to the player for interaction
 $form->send($player);
 ```
 
@@ -225,7 +239,13 @@ $form->send($player);
      ```php
      $form->addDropdown("Choose a color", ["Red", "Green", "Blue"]);
      ```
-5. **setSubmitAction(Closure $action): void**
+5. **addToggle(string $label, bool $default = false): void**
+   - Adds a toggle switch (on/off) that the player can interact with
+   - **Example:**
+     ```php
+     $form->addToggle("Enable PvP?", true);
+     ```
+6. **setSubmitAction(Closure $action): void**
    - Defines the action to be executed when the form is submitted.
    - **Example:**
      ```php
